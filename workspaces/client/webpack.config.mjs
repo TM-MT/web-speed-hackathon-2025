@@ -24,8 +24,9 @@ const config = {
                 '@babel/preset-env',
                 {
                   corejs: '3.41',
-                  forceAllTransforms: true,
-                  targets: 'defaults',
+                  targets: {
+                    browsers: ['>2.0%', 'not dead', 'not op_mini all'],
+                  },
                   useBuiltIns: 'entry',
                 },
               ],

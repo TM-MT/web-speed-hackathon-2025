@@ -5,7 +5,11 @@ import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
 
 /** @type {import('webpack').Configuration} */
 const config = {
-  devtool: 'inline-source-map',
+  cache: {
+    cacheDirectory: path.resolve(import.meta.dirname, '.webpack_cache'),
+    type: 'filesystem',
+  },
+  devtool: 'source-map',
   entry: './src/main.tsx',
   mode: 'production',
   module: {
@@ -61,11 +65,7 @@ const config = {
     publicPath: 'auto',
   },
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  plugins: [
-    new webpack.EnvironmentPlugin({ API_BASE_URL: '/api', NODE_ENV: '' }),
-    // eslint-disable-next-line @typescript-eslint/no-unsafe-call
-    new BundleAnalyzerPlugin(),
-  ],
+  plugins: [new webpack.EnvironmentPlugin({ API_BASE_URL: '/api', NODE_ENV: '' }), new BundleAnalyzerPlugin()],
   resolve: {
     extensions: ['.js', '.cjs', '.mjs', '.ts', '.cts', '.mts', '.tsx', '.jsx'],
   },

@@ -62,7 +62,6 @@ const config = {
   },
   // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
   plugins: [
-    new webpack.optimize.LimitChunkCountPlugin({ maxChunks: 1 }),
     new webpack.EnvironmentPlugin({ API_BASE_URL: '/api', NODE_ENV: '' }),
     // eslint-disable-next-line @typescript-eslint/no-unsafe-call
     new BundleAnalyzerPlugin(),

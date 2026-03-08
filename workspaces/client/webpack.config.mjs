@@ -19,7 +19,7 @@ const config = {
         resolve: {
           fullySpecified: false,
         },
-        test: /\.(?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$/,
+        test: /src\/.*\.(?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$/,
         use: {
           loader: 'babel-loader',
           options: {

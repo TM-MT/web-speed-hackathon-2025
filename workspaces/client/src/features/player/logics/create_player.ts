@@ -1,7 +1,7 @@
 import '@videojs/http-streaming';
 import HlsJs from 'hls.js';
 import shaka from 'shaka-player';
-import videojs from 'video.js';
+import type videojs from 'video.js';
 
 import { PlayerType } from '@wsh-2025/client/src/features/player/constants/player_type';
 import { PlayerWrapper } from '@wsh-2025/client/src/features/player/interfaces/player_wrapper';
@@ -130,14 +130,15 @@ class VideoJSPlayerWrapper implements PlayerWrapper {
     muted: true,
     volume: 0.25,
   });
-  private _player = videojs(this.videoElement);
+  private _player;
   readonly playerType: PlayerType.VideoJS;
 
-  constructor(playerType: PlayerType.VideoJS) {
-    const vhsConfig = (videojs as unknown as { Vhs: VhsConfig }).Vhs;
+  constructor(playerType: PlayerType.VideoJS, vjs: typeof videojs) {
+    const vhsConfig = (vjs as unknown as { Vhs: VhsConfig }).Vhs;
     vhsConfig.GOAL_BUFFER_LENGTH = 50;
     vhsConfig.MAX_GOAL_BUFFER_LENGTH = 50;
     this.playerType = playerType;
+    this._player = vjs(this.videoElement);
   }
 
   get currentTime(): number {
@@ -177,7 +178,7 @@ class VideoJSPlayerWrapper implements PlayerWrapper {
   }
 }
 
-export const createPlayer = (playerType: PlayerType): PlayerWrapper => {
+export const createPlayer = async (playerType: PlayerType): Promise<PlayerWrapper> => {
   switch (playerType) {
     case PlayerType.ShakaPlayer: {
       return new ShakaPlayerWrapper(playerType);
@@ -186,7 +187,8 @@ export const createPlayer = (playerType: PlayerType): PlayerWrapper => {
       return new HlsJSPlayerWrapper(playerType);
     }
     case PlayerType.VideoJS: {
-      return new VideoJSPlayerWrapper(playerType);
+      const [{ default: videojs }] = await Promise.all([import('video.js')]);
+      return new VideoJSPlayerWrapper(playerType, videojs);
     }
     default: {
       playerType satisfies never;

@@ -1,6 +1,6 @@
 import '@videojs/http-streaming';
 import HlsJs from 'hls.js';
-import shaka from 'shaka-player';
+import type shaka from 'shaka-player';
 import type videojs from 'video.js';
 
 import { PlayerType } from '@wsh-2025/client/src/features/player/constants/player_type';
@@ -13,11 +13,12 @@ class ShakaPlayerWrapper implements PlayerWrapper {
     muted: true,
     volume: 0.25,
   });
-  private _player = new shaka.Player();
+  private _player: shaka.Player;
   readonly playerType: PlayerType.ShakaPlayer;
 
-  constructor(playerType: PlayerType.ShakaPlayer) {
+  constructor(playerType: PlayerType.ShakaPlayer, player: shaka.Player) {
     this.playerType = playerType;
+    this._player = player;
     this._player.configure({
       streaming: {
         bufferingGoal: 50,
@@ -181,7 +182,8 @@ class VideoJSPlayerWrapper implements PlayerWrapper {
 export const createPlayer = async (playerType: PlayerType): Promise<PlayerWrapper> => {
   switch (playerType) {
     case PlayerType.ShakaPlayer: {
-      return new ShakaPlayerWrapper(playerType);
+      const { default: shaka } = await import('shaka-player');
+      return new ShakaPlayerWrapper(playerType, new shaka.Player());
     }
     case PlayerType.HlsJS: {
       return new HlsJSPlayerWrapper(playerType);

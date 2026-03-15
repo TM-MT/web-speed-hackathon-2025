@@ -19,6 +19,8 @@ function getTime(d: Date): number {
 
 export function registerStreams(app: FastifyInstance): void {
   app.register(fastifyStatic, {
+    immutable: true,
+    maxAge: 60,
     prefix: '/streams/',
     root: path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../streams'),
   });
@@ -57,7 +59,7 @@ export function registerStreams(app: FastifyInstance): void {
       #EXT-X-ENDLIST
     `;
 
-    return reply.type('application/vnd.apple.mpegurl').send(playlist);
+    return reply.type('application/vnd.apple.mpegurl').header('cache-control', 'public, max-age=60').send(playlist);
   });
 
   app.get<{
@@ -128,6 +130,9 @@ export function registerStreams(app: FastifyInstance): void {
       );
     }
 
-    return reply.type('application/vnd.apple.mpegurl').send(playlist.join('\n'));
+    return reply
+      .type('application/vnd.apple.mpegurl')
+      .header('cache-control', 'public, max-age=60')
+      .send(playlist.join('\n'));
   });
 }

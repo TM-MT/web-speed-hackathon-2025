@@ -1,4 +1,3 @@
-import '@videojs/http-streaming';
 import HlsJs from 'hls.js';
 import type shaka from 'shaka-player';
 import type videojs from 'video.js';
@@ -189,7 +188,7 @@ export const createPlayer = async (playerType: PlayerType): Promise<PlayerWrappe
       return new HlsJSPlayerWrapper(playerType);
     }
     case PlayerType.VideoJS: {
-      const [{ default: videojs }] = await Promise.all([import('video.js')]);
+      const [{ default: videojs }] = await Promise.all([import('video.js'), import('@videojs/http-streaming')]);
       return new VideoJSPlayerWrapper(playerType, videojs);
     }
     default: {

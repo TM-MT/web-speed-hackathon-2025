@@ -12,7 +12,7 @@ const config = {
     cacheDirectory: path.resolve(import.meta.dirname, '.webpack_cache'),
     type: 'filesystem',
   },
-  devtool: 'source-map',
+  // devtool: 'source-map',
   entry: './src/main.tsx',
   mode: 'production',
   module: {

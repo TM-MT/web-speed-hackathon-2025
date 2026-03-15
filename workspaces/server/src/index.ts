@@ -13,11 +13,18 @@ async function main() {
 
   const app = fastify();
 
-  app.addHook('onSend', async (_req, reply) => {
-    reply.headers({
-      'cache-control': 'no-store',
-      'x-robots-tag': 'noindex',
-    });
+  app.addHook('onSend', async (req, reply) => {
+    if (req.url.match('.*api.*')) {
+      reply.headers({
+        'cache-control': 'no-store',
+        'x-robots-tag': 'noindex',
+      });
+    } else {
+      // assume static files
+      reply.headers({
+        'cache-control': 'max-age=60',
+      });
+    }
   });
   app.register(cors, {
     origin: true,

@@ -1,7 +1,10 @@
 import path from 'node:path';
 
+import { EsbuildPlugin } from 'esbuild-loader';
 import webpack from 'webpack';
 import { BundleAnalyzerPlugin } from 'webpack-bundle-analyzer';
+
+const useBundleAnalyzer = false;
 
 /** @type {import('webpack').Configuration} */
 const config = {
@@ -16,29 +19,16 @@ const config = {
     rules: [
       {
         exclude: [/node_modules\/video\.js/, /node_modules\/@videojs/],
+        // exclude: [/node_modules\/*\/.js/],
+        loader: 'esbuild-loader',
+        options: {
+          target: 'chrome140',
+          tsconfig: 'tsconfig.json',
+        },
         resolve: {
           fullySpecified: false,
         },
-        test: /src\/.*\.(?:js|mjs|cjs|jsx|ts|mts|cts|tsx)$/,
-        use: {
-          loader: 'babel-loader',
-          options: {
-            presets: [
-              [
-                '@babel/preset-env',
-                {
-                  corejs: '3.41',
-                  targets: {
-                    browsers: ['>2.0%', 'not dead', 'not op_mini all'],
-                  },
-                  useBuiltIns: 'entry',
-                },
-              ],
-              ['@babel/preset-react', { runtime: 'automatic' }],
-              ['@babel/preset-typescript'],
-            ],
-          },
-        },
+        test: /\.[jt]sx?$/,
       },
       {
         test: /\.png$/,
@@ -56,11 +46,24 @@ const config = {
     path: path.resolve(import.meta.dirname, './dist'),
     publicPath: 'auto',
   },
-  // eslint-disable-next-line @typescript-eslint/no-unsafe-assignment
-  plugins: [new webpack.EnvironmentPlugin({ API_BASE_URL: '/api', NODE_ENV: '' }), new BundleAnalyzerPlugin()],
+  plugins: [new webpack.EnvironmentPlugin({ API_BASE_URL: '/api', NODE_ENV: '' })],
   resolve: {
     extensions: ['.js', '.cjs', '.mjs', '.ts', '.cts', '.mts', '.tsx', '.jsx'],
   },
 };
+
+if (useBundleAnalyzer && BundleAnalyzerPlugin) {
+  // eslint-disable-next-line @typescript-eslint/no-unsafe-argument, @typescript-eslint/no-unsafe-call
+  config.plugins?.push(new BundleAnalyzerPlugin());
+} else {
+  config.optimization = {
+    minimizer: [
+      new EsbuildPlugin({
+        css: true,
+        target: 'chrome140',
+      }),
+    ],
+  };
+}
 
 export default config;
